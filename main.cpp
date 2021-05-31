@@ -3,14 +3,22 @@
 
 #include <iostream>
 #include <utility>
-#include <set>
+//#include <vector>
+#include <string>
 #include <urlmon.h>
-#include "records.h"
+#include <fstream>
+#include <unordered_map>
+#include "field.h"
+#include "utils.h"
+//#include "records.h"
 
 using std::cin;
 using std::cout;
 using std::endl;
 using std::find;
+using std::ifstream;
+using std::vector;
+using std::string;
 
 static const char url[] = "https://opendata.ecdc.europa.eu/covid19/vaccine_tracker/csv/data.csv";
 static const char filepath[] = "data.csv";
@@ -25,23 +33,49 @@ bool loadData(ifstream &file)
 {
     file.open(filepath, std::ios_base::in);
     return file.good();
+
 }
 
-bool processData(ifstream file, vector<size_t> &indices)
+bool processData(ifstream &file, vector<size_t> &indices)
 {
+    cout << "Processing data..." << endl;
     string line;
     //getline(file, line);
+    auto tt=file.tellg();
     while (getline(file, line))
     {
-        indices.push_back(SEEK_CUR);
+        tt=file.tellg();
+        indices.push_back(tt);
     }
+    return true;
+}
+
+void printHelp()
+{
+
+}
+
+bool processQuery(string &query)
+{
+    vector<string> args = split(query, " ");
+
+    if (args[0] == "filter")
+    {
+
+    }
+    else if (args[0] == "analyze")
+    {
+
+    }
+    else
+        return false;
+
+
     return true;
 }
 
 int main()
 {
-
-
     if(updateData())
         cout << "Success! File stored at " << filepath << endl;
     else
@@ -55,6 +89,25 @@ int main()
         exit(1);
     }
 
-    cout << "Processing data..." << endl;
-    cout << 
+    vector<size_t> indices;
+
+    if (!processData(file, indices))
+        exit(1);
+    cout << "Data processing complete." << endl;
+    cout << "Total: " << indices.size() << " entries." << endl;
+    cout << "Enter help for query instructions" << endl;
+    while (true)
+    {
+        cout << ">";
+        string query;
+        getline(cin, query);
+        if (query == "exit")
+            break;
+        if (query == "help")
+            printHelp();
+        else if (!processQuery(query))
+            cout << "Query error, please check your input." << endl;
+    }
+    cout << "Exiting..." << endl;
+    return 0;
 }
