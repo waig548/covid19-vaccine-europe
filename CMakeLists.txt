@@ -3,4 +3,4 @@ project(covid)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(covid2 main2.cpp records.cpp records.h utils.h)
+add_executable(covid main.cpp records.cpp records.h utils.h)
