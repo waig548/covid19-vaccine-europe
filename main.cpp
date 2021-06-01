@@ -2,15 +2,9 @@
 #pragma once
 
 #include <iostream>
-#include <utility>
-//#include <vector>
 #include <string>
 #include <urlmon.h>
-#include <fstream>
-#include <unordered_map>
-#include "field.h"
-#include "utils.h"
-//#include "records.h"
+#include "data_frame.h"
 
 using std::cin;
 using std::cout;
@@ -36,17 +30,19 @@ bool loadData(ifstream &file)
 
 }
 
-bool processData(ifstream &file, vector<size_t> &indices)
+bool processData(ifstream &file, vector<streampos> &indices)
 {
     cout << "Processing data..." << endl;
     string line;
-    //getline(file, line);
-    auto tt=file.tellg();
-    while (getline(file, line))
-    {
-        tt=file.tellg();
-        indices.push_back(tt);
-    }
+    getline(file, line);
+    //auto tt = file.tellg();
+    do
+        indices.push_back(file.tellg());
+    while (getline(file, line));
+    file.clear();
+    file.seekg(indices[0]);
+    //auto tt=file.tellg();
+    indices.pop_back();
     return true;
 }
 
@@ -55,13 +51,62 @@ void printHelp()
 
 }
 
-bool processQuery(string &query)
+bool processQuery(string &query, DataFrame &data, vector<streampos> &selected)
 {
+    cout << "Processing query..." << endl;
     vector<string> args = split(query, " ");
 
-    if (args[0] == "filter")
+    if (args[0] == "include" || args[0] == "exclude" || args[0] == "filter" )
     {
-
+        bool add = args[0] == "include";
+        bool neg = args[0] == "exclude";
+        auto f = Field::of(args[1]);
+        if (f==Field::Unknown)
+            return false;
+        if (f.type==Field::Numeric)
+        {
+            auto op=Operator<size_t>::of(args[2]);
+            auto value=stoullOrElse(args[3]);
+            if (add)
+                for (auto pos: data.getIndices())
+                {
+                    if (std::count(selected.begin(),selected.end(), pos))
+                        continue;
+                    if (op.check(data.goTo(pos).readEntry().getNumeric(f), value))
+                        selected.push_back(pos);
+                }
+            else
+            {
+                vector<streampos> tmp;
+                for (auto pos: selected)
+                    if (neg ^ op.check(data.goTo(pos).readEntry().getNumeric(f), value))
+                        tmp.push_back(pos);
+                selected = tmp;
+            }
+        }
+        else
+        {
+            auto op=Operator<string>::of(args[2]);
+            auto value=args[3];
+            if (add)
+                for (auto pos: data.getIndices())
+                {
+                    if (std::count(selected.begin(),selected.end(), pos))
+                        continue;
+                    if (op.check(data.goTo(pos).readEntry().getString(f), value))
+                        selected.push_back(pos);
+                }
+            else
+            {
+                vector<streampos> tmp;
+                for (auto pos: selected)
+                    if (op.check(data.goTo(pos).readEntry().getString(f), value))
+                        tmp.push_back(pos);
+                selected = tmp;
+            }
+        }
+        cout << "Query successful." << endl;
+        cout << "Selected: " << selected.size() << " entries." << endl;
     }
     else if (args[0] == "analyze")
     {
@@ -89,12 +134,14 @@ int main()
         exit(1);
     }
 
-    vector<size_t> indices;
+    vector<streampos> indices;
 
     if (!processData(file, indices))
         exit(1);
     cout << "Data processing complete." << endl;
     cout << "Total: " << indices.size() << " entries." << endl;
+    DataFrame data(file, indices);
+    vector<streampos> selected;
     cout << "Enter help for query instructions" << endl;
     while (true)
     {
@@ -105,9 +152,10 @@ int main()
             break;
         if (query == "help")
             printHelp();
-        else if (!processQuery(query))
+        else if (!processQuery(query, data, selected))
             cout << "Query error, please check your input." << endl;
     }
     cout << "Exiting..." << endl;
+
     return 0;
 }
