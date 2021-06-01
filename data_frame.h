@@ -3,9 +3,9 @@
 //
 
 #include <fstream>
-#include <vector>
 #include <unordered_map>
 #include "field.h"
+#include "operator.h"
 #include "utils.h"
 
 using std::ifstream;
@@ -21,7 +21,7 @@ class DataFrame
 {
     ifstream &fileStream;
     vector<streampos> indices;
-    size_t curLine;
+    //size_t curLine;
     streampos curPos;
 public:
     class Entry
@@ -41,8 +41,12 @@ public:
     DataFrame copy();
     DataFrame copy(const vector<streampos>& newIndices);
 
+    DataFrame& goTo(streampos pos);
     DataFrame& goToLine(size_t line);
     Entry readEntry();
+    vector<streampos> getIndices() const;
+    size_t getCurrentLine() const;
+    streampos getCurrentPos() const;
 
 
 };

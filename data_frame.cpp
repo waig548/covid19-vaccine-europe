@@ -6,8 +6,8 @@
 
 DataFrame::DataFrame(ifstream &file, const vector<streampos>& lines) : fileStream(file), indices(lines)
 {
-    curLine = 0;
-    curPos = lines[curLine];
+    //curLine = 0;
+    curPos = fileStream.tellg();
     fileStream.seekg(curPos);
 }
 
@@ -21,10 +21,18 @@ DataFrame DataFrame::copy(const vector<streampos>& newIndices)
     return DataFrame(fileStream, newIndices);
 }
 
+DataFrame &DataFrame::goTo(streampos pos)
+{
+    //curLine=std::find(indices.begin(), indices.end(), pos) - indices.begin();
+    curPos=pos;
+    fileStream.seekg(curPos);
+    return *this;
+}
+
 DataFrame &DataFrame::goToLine(size_t line)
 {
-    curLine=line;
-    curPos=indices[curLine];
+    //curLine=line;
+    curPos=indices[line];
     fileStream.seekg(curPos);
     return *this;
 }
@@ -33,11 +41,11 @@ DataFrame::Entry DataFrame::readEntry()
 {
     string raw;
     getline(fileStream, raw);
-    curLine++;
-    curPos=indices[curLine];
+    //curLine++;
+    curPos=fileStream.tellg();
     if (curPos==indices.back())
     {
-        curLine = 0;
+        //curLine = 0;
         curPos=indices.front();
         if (fileStream.eof())
             fileStream.clear();
@@ -45,6 +53,22 @@ DataFrame::Entry DataFrame::readEntry()
     }
     return Entry(raw);
 }
+
+vector<streampos> DataFrame::getIndices() const
+{
+    return indices;
+}
+
+size_t DataFrame::getCurrentLine() const
+{
+    return -1;//curLine;
+}
+
+streampos DataFrame::getCurrentPos() const
+{
+    return curPos;
+}
+
 
 DataFrame::Entry::Entry(const vector<string>& data)
 {
