@@ -35,12 +35,36 @@ Field Field::of(const string &k)
 
 std::vector<Field> Field::values()
 {
-    return valueList;
+    auto tmp = valueList;
+    tmp.pop_back();
+    return tmp;
 }
 
 Field::Field(string k, size_t i, Type t): key(std::move(k)), index(i), type(t)
 {
     valueList.push_back(*this);
 }
+
+bool operator==(const Field& l, const Field& r)
+{
+    if (l.key!=r.key)
+        return false;
+    return true;
+}
+
+bool operator!=(const Field& l, const Field& r)
+{
+    return !(l==r);
+}
+
+bool operator<(const Field& l, const Field& r)
+{
+    if (l==Field::Year && r==Field::Week)
+        return true;
+    if (l.index<r.index)
+        return true;
+    return false;
+}
+
 
 

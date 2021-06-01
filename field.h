@@ -13,11 +13,8 @@ using std::string;
 
 class Field final
 {
-private:
-    static std::vector<Field> valueList;
-    enum Type {String, Numeric};
-    Field(string  k, size_t i, Type t = String);
 public:
+    enum Type {String, Numeric};
     string key;
     size_t index;
     Type type;
@@ -39,6 +36,14 @@ public:
     static Field of(const string& k);
     static std::vector<Field> values();
 
+    friend bool operator== (const Field& l, const Field& r);
+    friend bool operator!= (const Field& l, const Field& r);
+    friend bool operator< (const Field& l, const Field& r);
+
+private:
+    static std::vector<Field> valueList;
+
+    Field(string  k, size_t i, Type t = String);
 };
 
 #endif //COVID_FIELD_H
