@@ -38,4 +38,16 @@ static std::vector<size_t> parseYearWeekISO(const std::string& s)
     return tmp;
 }
 
+static std::string toLowerCase(const std::string& s)
+{
+    std::string tmp;
+    std::transform(s.begin(), s.end(), tmp.begin(), [](unsigned char c){return tolower(c);});
+    return tmp;
+}
+
+static bool equalsCaseInsensitive(const std::string& a, const std::string& b)
+{
+    return toLowerCase(a)==toLowerCase(b);
+}
+
 #endif //COVID_UTILS_H
