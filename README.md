@@ -9,3 +9,9 @@ So I might come back to this at some point.
 `master` - current developement
 
 `attempt-01-failed` - failed attempt
+
+# covid19-vaccine-europe-master
+
+An attempt of using pointers to locate every entry (row) of data, turns out to be far quicker than `attempt-01-failed`, both data preprocessing and operation performance have seen significant improvements.
+
+Currently WIP, with some archival and referencing purposes.
