@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include "utils.h"
 
 using std::function;
 using std::string;
@@ -32,35 +33,17 @@ public:
     static const Operator<string> neqs;
     static const Operator<string> unknowns;
 
-    //template<typename U>
     static Operator<T> of(const string& k);
-
-    //template<typename U>
     static std::vector<Operator<T>> values();
-
-    static Operator<size_t> ofNumericOps(const string& k);
-    static std::vector<Operator<size_t>> numericOperators();
-    static Operator<string> ofStringOps(const string& k);
-    static std::vector<Operator<string>> stringOperators();
+    bool operator== (const Operator<T>& b);
 private:
+    size_t ordinal;
     static std::vector<Operator<size_t>> numericOps;
     static std::vector<Operator<string>> stringOps;
-
+    static size_t ordinals;
     //template<typename U>
-    Operator(string k, const std::function<bool(size_t , size_t)>& lambda);
-
-
-    Operator(string k, const std::function<bool(string, string)>& lambda);     /*
-    Operator<size_t>(string k, const std::function<bool(size_t, size_t)>& lambda): key(std::move(k)), check(lambda)
-    {
-        numericOps.push_back(*this);
-    }
-    Operator<string>(string k, const std::function<bool(string, string)>& lambda): key(std::move(k)), check(lambda)
-    {
-        stringOps.push_back(*this);
-    }
-    */
-
+    Operator(string k, const std::function<bool(size_t , size_t)>& lambda, size_t o = ordinals++);
+    Operator(string k, const std::function<bool(string, string)>& lambda, size_t o = ordinals++);
 };
 
 
