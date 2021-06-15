@@ -41,7 +41,7 @@ static std::vector<size_t> parseYearWeekISO(const std::string& s)
 static std::string toLowerCase(const std::string& s)
 {
     std::string tmp;
-    std::transform(s.begin(), s.end(), tmp.begin(), [](unsigned char c){return tolower(c);});
+    std::transform(s.begin(), s.end(), std::back_inserter(tmp), [](unsigned char c){return tolower(c);});
     return tmp;
 }
 
