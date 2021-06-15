@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "utils.h"
 
 using std::string;
 
@@ -14,12 +15,14 @@ using std::string;
 class Field final
 {
 public:
-    enum Type {String, Numeric};
+    enum Type: size_t{Numeric = 0, String = 1};
     string key;
     size_t index;
     Type type;
+    string name;
     static const Field Year;
     static const Field Week;
+    static const Field YearWeekISO;
 	static const Field FirstDose;
 	static const Field FirstDoseRefused;
 	static const Field SecondDose;
@@ -41,9 +44,10 @@ public:
     friend bool operator< (const Field& l, const Field& r);
 
 private:
+    size_t const ordinal;
     static std::vector<Field> valueList;
-
-    Field(string  k, size_t i, Type t = String);
+    static size_t ordinals;
+    Field(string n, string k, size_t i, Type t = String, size_t o = ordinals++);
 };
 
 #endif //COVID_FIELD_H
